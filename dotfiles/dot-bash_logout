@@ -1,8 +1,0 @@
-# This script is used for logging out of an interactive, login Bash shell. The
-# script should contain cleanup functionality. While I don't think I'll ever
-# use it, it is nice to know it exists.
-
-# when leaving the console clear the screen to increase privacy
-if [ "$SHLVL" = 1 ]; then
-    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
-fi
