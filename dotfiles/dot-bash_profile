@@ -1,0 +1,14 @@
+# This script is ran when the Bash shell is launched as an interactive login
+# shell. It is normally executed once and should probably source the `.bashrc`
+# file, too.
+
+# Source interactive shell script on startup, if it exists
+# `-n` returns a boolean on whether the length of the string is non-zero, and
+# `-r` returns a boolean on whether the file exists and is readable.
+#
+# TODO: `$BASH` may not always be pointing to the Bash executable. In some 
+# insane instances, some [EXPLETIVE] may set the `$BASH` env variable to 
+# something else. In most instances, this won't happen, though.
+if [ -n "$BASH" ] && [ -r ~/.bashrc ]; then
+    . ~/.bashrc
+fi

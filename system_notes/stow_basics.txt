@@ -1,0 +1,47 @@
+`Stow` is a "symlink farm manager". In layman's terms, that means Stow creates
+symbolic links in the file system that matches the Stow structure. Confusing,
+but futher examples make it easier to understand for the layman (such as 
+myself). 
+
+When `stow` is invoked, it will take the contents of the packages in the `stow`
+directory and create symbolic links through the file system. This is to be used
+to make keeping all of my dotfiles in one place. I can update them and have the
+effects cascade, then create a github repository to safely store them. Good
+programmers are lazy :)
+
+There is a package directory and an installation image. The package directory
+will exist in the `stow` root directory (NOT system root, for clarification).
+The package directory will be named something, but the subtrees of the package
+must be structured in the way they will appear when `stow/<package>` is removed
+from the path.
+
+For instance, for '/usr/local/stow/perl` for the Perl package directory (ew),
+the installation image would look like `/usr/local/stow/perl/bin/perl`. 
+`.../bin/perl` is the Perl executable, and when `stow` is executed, the 
+symbolic link will be placed in `/usr/local/bin/perl`, pointing to the 
+installation image in the package directory.
+
+~/stow/config/.config/nvim/init.lua
+                     /<other_prog>/init.ini
+                     /<other_prog_2>/init.ini
+~/.config/nvim/init.lua
+         /<other_prog>/init.ini
+	 /<other_prog_2>/init.ini
+
+When setting this up, all files with a period prefix should have the period 
+replaced with the `dot-` prefix. For instance, `.config` should be `dot-config`
+and the `stow` command should use the option `--dotfiles`.
+
+`-n` and `-v`, which prevents system modification and displays verbose 
+messages, can be used to display what would happen when `stow` is executed.
+This should be made into a script that is ignored during `stow` invocation.
+
+When running `stow`, there should be a main folder. Inside this folder are 
+several other folders, each one a package. In the package should be another
+series of folders (or none, if in the home directory) that will indicate where
+the symbolic link will be placed. Subdirectories will be made on demand.
+
+~/linux_config/nvim/.config/nvim/init.lua
+user@dev:~/stow > stow --dotfile --verbose nvim
+The main and package directory will be dropped, making a symbolic link in the
+~/.config/nvim/ folder.

@@ -1,0 +1,4 @@
+Arch install
+Audio drivers
+Set i3/window managers to use gpu for processing
+Configure wifi/lan
