@@ -44,7 +44,7 @@ endif
 let &laststatus=2
 
 " Declare, define, and set the status line.
-let &statusline = "%F\\ %(\[%M%R%W\]%)%=c%c\\ @\\ l%l\\ /\\ %L\\ (%P)"
+let &statusline = "%F\ %(\[%M%R%W\]%)%=c%c\ @\ l%l\ /\ %L\ (%P)"
 
 " Turn on case-insensitive search
 set ignorecase | set smartcase
@@ -110,8 +110,8 @@ nmap <silent> <Leader>ti <cmd>set expandtab!<CR>
 
 " Toggle folding type; useful for when some files use markers instead of syntax
 " file
-" Due to generic name of 'ToggleFold', I added two underscores to attempt to make
-" the name more unique
+" Due to generic name of 'ToggleFold', I added two underscores to attempt to 
+" make the name more unique
 function! ToggleFold__()
     let &foldmethod = (&foldmethod == "marker" ? "syntax" : "marker")
 endfunction
