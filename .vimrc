@@ -7,7 +7,7 @@
 " For this rewrite, I lumped several sections together in folds. These folds are
 " separated by 80-char long strings of comment chars (double quotes | ") and
 " any autocommands for that section are blocked off in 40-char long strings of
-" comment chars. 
+" comment chars.
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -16,10 +16,8 @@
 let g:mapleader = " "
 let g:localmapleader = " "
 
-" TODO: Add code to change the folding method to brackets/syntax; Vim will
-" apply the folding when entering the buffer (I think); changing it after will
-" retain the original fold settings, too. 
-set foldmethod=marker
+" Set folding method based on syntax language rules
+let &foldmethod="syntax"
 
 " When splitting horiz/vert, open the new window to the right/below the current
 set splitright | set splitbelow
@@ -35,20 +33,18 @@ set formatoptions-=cro
 nmap <silent> <C-w>h <cmd>sp<CR>
 
 " Decrese the write-to-disk time and timeout for keybinds
-set updatetime=250
-set timeoutlen=300
+let &updatetime=250
+let &timeoutlen=300
 
 if has("xterm_clipboard")
-    const s:clipboardName = has("unnamedplus") ? "unnamedplus" : "unnamed"
-    execute "set clipboard " . s:clipboardName
+    let &clipboard = (has("unnamedplus") ? "unnamedplus" : "unnamed")
 endif
 
 " Make status line visible always
-set laststatus=2
+let &laststatus=2
 
 " Declare, define, and set the status line.
-let s:statusLine = "%F\\ %(%M%R%W%)%=c%c\\ @\\ l%l\\ /\\ %L\\ (%P)"
-execute "set statusline=".s:statusLine
+let &statusline = "%F\\ %(\[%M%R%W\]%)%=c%c\\ @\\ l%l\\ /\\ %L\\ (%P)"
 
 " Turn on case-insensitive search
 set ignorecase | set smartcase
@@ -59,14 +55,14 @@ set ignorecase | set smartcase
 " TEXT/EDITOR FORMATTING {{{
 " Ruler, so I can stay within 80 characters in a single line
 if has("syntax")
-    set colorcolumn=80
+    let &colorcolumn=80
 endif
 
 " Set line numbers/number of lines away from the cursor
 set number | set relativenumber
 
 " Set minimum number of lines above and below the cursor 
-set scrolloff=7 
+let &scrolloff=7 
 
 " Highlight the current line
 set cursorline
@@ -86,13 +82,20 @@ nmap <up>    :echo "Use 'k' to move up :)"<CR>
 nmap <right> :echo "Use 'l' to move up :)"<CR>
 
 " Move between different Vim windows (left/down/up/right)
-nmap <silent> <C-h> <C-w><C-h> | nmap <silent> <C-left>  <C-w><C-h>
-nmap <silent> <C-j> <C-w><C-j> | nmap <silent> <C-down>  <C-w><C-j>
-nmap <silent> <C-k> <C-w><C-k> | nmap <silent> <C-up>    <C-w><C-k>
-nmap <silent> <C-l> <C-w><C-l> | nmap <silent> <C-right> <C-w><C-l>
+nmap <silent> <C-h>     <C-w><C-h>
+nmap <silent> <C-left>  <C-w><C-h>
+
+nmap <silent> <C-j>     <C-w><C-j>
+nmap <silent> <C-down>  <C-w><C-j>
+
+nmap <silent> <C-k>     <C-w><C-k>
+nmap <silent> <C-up>    <C-w><C-k>
+
+nmap <silent> <C-l>     <C-w><C-l>
+nmap <silent> <C-right> <C-w><C-l>
 
 " Allow easier escape from terminal mode
-tmap <silent> <Esc><Esc> <C-\\><C-n>
+tmap <silent> <Esc><Esc> <C-\><C-n>
 
 " Implement Home/End to start/end of line, like in Windows (force of habit)
 imap <Home> <Esc>I
@@ -103,7 +106,19 @@ imap <End> <Esc>A
 
 " CUSTOM COMMANDS {{{
 " Toggle indentation types if not properly set
-nmap <silent> <Leader>ti :set expandtab!<CR>
+nmap <silent> <Leader>ti <cmd>set expandtab!<CR>
+
+" Toggle folding type; useful for when some files use markers instead of syntax
+" file
+" Due to generic name of 'ToggleFold', I added two underscores to attempt to make
+" the name more unique
+function! ToggleFold__()
+    let &foldmethod = (&foldmethod == "marker" ? "syntax" : "marker")
+endfunction
+nmap <silent> <Leader>tf <cmd>call ToggleFold__()<CR>
+
+" Allow easier toggling of folds
+nnoremap <silent> <Enter> za
 
 """"""""""""""""""""""""""""""""""""""""
 " TODO: CREATE CUSTOM COMMAND TO DO A FULL REPLACE, USING TCL SYNTAX (.C)
@@ -113,32 +128,32 @@ nmap <silent> <Leader>ti :set expandtab!<CR>
 """"""""""""""""""""""""""""""""""""""""
 " A dictionary of file extensions (minus the '.') that special formatting should
 " be applied to
-const g:languageTable = {
-\   "sh":   1,
-\   "shl":  1,
-\   "js":   2,
-\   "ts":   2,
-\   "jsx":  2,
-\   "tsx":  2
-\}
+const s:languageTable = {
+    \ "sh":   1,
+    \ "shl":  1,
+    \ "js":   2,
+    \ "ts":   2,
+    \ "jsx":  2,
+    \ "tsx":  2
+\ }
 
 " The commands to run for each file type listed above
-const g:languageFormatCmds = {
-\   0: [ 'expandtab',   'tabstop=4', 'shiftwidth=4' ],
-\   1: [ 'noexpandtab', 'tabstop=4', 'shiftwidth=0' ],
-\   2: [ 'expandtab',   'tabstop=2', 'shiftwidth=2' ]
-\}
+const s:languageFormatCmds = {
+    \ 0: [ 'expandtab',   'tabstop=4', 'shiftwidth=4' ],
+    \ 1: [ 'noexpandtab', 'tabstop=4', 'shiftwidth=0' ],
+    \ 2: [ 'expandtab',   'tabstop=2', 'shiftwidth=2' ]
+\ }
 
 " Get the file extension and attempt to get the list of commands
 function! s:setFileFormatParams()
     let l:fileExt = expand("%:e")
-    let l:langTableKey = get(g:languageTable, fileExt, 0)
+    let l:langTableKey = get(s:languageTable, fileExt, 0)
 
-    if !has_key(g:languageFormatCmds, l:langTableKey)
+    if !has_key(s:languageFormatCmds, l:langTableKey)
         return
     endif
 
-    for cmd in get(g:languageFormatCmds, l:langTableKey)
+    for cmd in get(s:languageFormatCmds, l:langTableKey)
         execute "set " . cmd
     endfor
 endfunction
@@ -213,7 +228,7 @@ set termguicolors
 highlight clear
 
 if exists("syntax_on")
-  syntax reset
+    syntax reset
 endif
 
 " this can be changed to 'transparant' or something to allow using the 
@@ -222,10 +237,10 @@ set background=dark
 let g:colors_name = "cyberpunk"
 
 function! HighlightFor(group, ...)
-  execute "hi ".a:group
-        \ ." guifg=".a:1
-        \ ." guibg=".a:2
-        \ ." gui=".a:3
+    execute "hi " . a:group
+        \ . " guifg=".a:1
+        \ . " guibg=".a:2
+        \ . " gui=".a:3
 endfunction
 
 " general 
